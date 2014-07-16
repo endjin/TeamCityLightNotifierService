@@ -7,11 +7,7 @@
         static void Main(string[] args)
         {
             var lightnotifier = new LightNotifier();
-            while (true)
-            {
-                lightnotifier.UpdateLight();
-                Thread.Sleep(10000);
-            }
+            lightnotifier.UpdateLightContinuously();
         }
     }
 }

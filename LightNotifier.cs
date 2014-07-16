@@ -21,6 +21,15 @@
             lightController = new BusylightLyncController();
         }
 
+        public void UpdateLightContinuously()
+        {
+            while (true)
+            {
+                UpdateLight();
+                Thread.Sleep(10000);
+            }
+        }
+
         private void FlashLightWhenError()
         {
             for (int i = 0; i < 20; i++)
@@ -42,7 +51,8 @@
                 GreenRgbValue = 0
             });
         }
-        public void UpdateLight()
+
+        private void UpdateLight()
         {
             var buildids = teamcitydataservice.GetBuildIds("BuildConfigIds.txt");
             var lastBuilds = teamcitydataservice.GetTeamCityBuilds(buildids);
