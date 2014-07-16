@@ -1,6 +1,5 @@
 ﻿namespace TeamCityLightNotifierService
 {
-    using System.Threading;
 
     class Program
     { 
