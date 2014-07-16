@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
 
     using Plenom.Components.Busylight.Sdk;
@@ -9,35 +10,42 @@
     using TeamCitySharp.DomainEntities;
     using TeamCitySharp.Locators;
 
-    class LightNotifier {
+    class LightNotifier
+    {
+        private readonly BusylightLyncController lightController;
+        private readonly TeamCityDataService teamcitydataservice;
+
         public LightNotifier()
         {
-            
+            this.teamcitydataservice = new TeamCityDataService();
+            lightController = new BusylightLyncController();
         }
-        private void FlashLightWhenError(BusylightLyncController lightController)
+
+        private void FlashLightWhenError()
         {
             for (int i = 0; i < 20; i++)
             {
                 lightController.Light(BusylightColor.Red);
                 Thread.Sleep(500);
-                this.GetPinkBusyLightColor(lightController);
+                this.GetPinkBusyLightColor();
                 Thread.Sleep(500);
 
             }
 
         }
-        private void GetPinkBusyLightColor(BusylightLyncController lightController)
+        private void GetPinkBusyLightColor()
         {
-            lightController.Light(new BusylightColor()
+            lightController.Light(new BusylightColor
             {
                 BlueRgbValue = 255,
                 RedRgbValue = 255,
                 GreenRgbValue = 0
             });
         }
-        public void UpdateLight(List<Build> lastBuilds)
+        public void UpdateLight()
         {
-            var lightController = new BusylightLyncController();
+            var buildids = teamcitydataservice.GetBuildIds("BuildConfigIds.txt");
+            var lastBuilds = teamcitydataservice.GetTeamCityBuilds(buildids);
 
             if (lastBuilds.All(build => build.Status == BuildStatus.SUCCESS.ToString()))
             {
@@ -45,13 +53,13 @@
             }
             else if (lastBuilds.Any(build => build.Status == BuildStatus.FAILURE.ToString()))
             {
-                this.FlashLightWhenError(lightController);
+                this.FlashLightWhenError();
 
 
             }
             else if (lastBuilds.Any(build => build.Status == BuildStatus.ERROR.ToString()))
             {
-                this.GetPinkBusyLightColor(lightController);
+                this.GetPinkBusyLightColor();
             }
         }
     }
